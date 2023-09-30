@@ -17,6 +17,12 @@ namespace UserService.Api.Services
         public DbSet<User> Table => _context.Set<User>();
 
 
+        public async Task<List<User>> GetUserByIdList(List<string> userIds)
+        {
+            List<User> users = await Table.AsQueryable().Where(e => userIds.Contains(e.Id)).ToListAsync();
+            return users;
+        }
+        
         public async Task<bool> AddAysnc(User Model)
         {
             EntityEntry entityEntry = await Table.AddAsync(Model);

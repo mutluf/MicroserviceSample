@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AggregatorService.Abstractions;
+using AggregatorService.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AggregatorService.Controllers
 {
@@ -6,15 +8,26 @@ namespace AggregatorService.Controllers
     [ApiController]
     public class CoursesContoller : ControllerBase
     {
-        [HttpGet("{id}/users")]
-        public string CoursesWithUsers([FromRoute] string id)
+        private readonly ICourseUserService _courseUserService;
+
+
+        public CoursesContoller(ICourseUserService courseUserService)
         {
-            return "courses-users " + id;
+            _courseUserService = courseUserService;
+        }
+
+        [HttpGet("{id}/users")]
+        public async Task<IActionResult> CoursesWithUsers([FromRoute] string id)
+        {
+            var course = await _courseUserService.GetCourse(id);
+            var users =  await _courseUserService.GetUsers(id);
+
+            return Ok(new {users = users, course= course});
         }
 
         [HttpPost]
         [Route("/courses/users")]
-        public string CoursesPost()
+        public string CoursesPost([FromBody] CourseUser participant)
         {
             return "post";
         }

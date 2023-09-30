@@ -17,9 +17,18 @@ namespace UserService.Api.Controllers
 
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromQuery] List<string>? userId)
         {
-            List<User> users = _userService.GetAll().ToList();
+            List<User> users;
+            if (userId == null)
+            {
+                users = _userService.GetAll().ToList();
+            }
+            else
+            {
+                users = await _userService.GetUserByIdList(userId);
+            }
+           
 
             return Ok(users);
         }
