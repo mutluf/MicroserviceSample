@@ -6,5 +6,6 @@ namespace AggregatorService.Abstractions
     {
         Task<CourseDto> GetCourse(string courseId);
         Task<List<UserDto>> GetUsers(string courseId);
+        Task PostCourse(string courseId, string userId);
     }
 }

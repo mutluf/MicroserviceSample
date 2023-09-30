@@ -27,9 +27,11 @@ namespace AggregatorService.Controllers
 
         [HttpPost]
         [Route("/courses/users")]
-        public string CoursesPost([FromBody] CourseUser participant)
+        public IActionResult CoursesPost([FromBody] CourseUser courseUser)
         {
-            return "post";
+            _courseUserService.PostCourse(courseUser.CourseId, courseUser.UserId);
+
+            return Ok();
         }
     }
 }
