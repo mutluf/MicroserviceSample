@@ -5,6 +5,7 @@ namespace UserService.Api.Abstractions
 {
     public interface IUserService
     {
+        Task<List<User>> GetUserByIdList(List<string> userIds);
         IQueryable<User> GetAll();
         IQueryable<User> GetWhere(Expression<Func<User, bool>> method);
         Task<User> GetByIdAysnc(string id);

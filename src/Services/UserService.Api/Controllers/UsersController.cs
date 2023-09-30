@@ -4,22 +4,31 @@ using UserService.Api.Entities;
 
 namespace UserService.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
 
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromQuery] List<string>? userId)
         {
-            List<User> users = _userService.GetAll().ToList();
+            List<User> users;
+            if (userId == null)
+            {
+                users = _userService.GetAll().ToList();
+            }
+            else
+            {
+                users = await _userService.GetUserByIdList(userId);
+            }
+           
 
             return Ok(users);
         }

@@ -1,24 +1,19 @@
 ﻿using CourseService.Api.Abstractions;
 using CourseService.Api.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourseService.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/courses")]
     [ApiController]
-    public class CourseController : ControllerBase
+    public class CoursesController : ControllerBase
     {
         private readonly ICourseService _courseService;
 
-        public CourseController(ICourseService courseService)
+        public CoursesController(ICourseService courseService)
         {
             _courseService = courseService;
         }
-
-        //public CourseController(ICourseService courseService) =>
-        //    _courseService = courseService;
-
 
         [HttpGet]
         public async Task<List<Course>> Get() =>
