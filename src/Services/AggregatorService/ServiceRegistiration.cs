@@ -1,6 +1,8 @@
 ﻿using AggregatorService.Abstractions;
 using AggregatorService.Context;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace AggregatorService
 {
@@ -11,8 +13,8 @@ namespace AggregatorService
             services.AddDbContext<CourseUserDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("MicrosoftSQL")));
 
-
             services.AddScoped<ICourseUserService, Services.CourseUserService>();
         }
+
     }
-}
+    }

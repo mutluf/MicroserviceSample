@@ -2,6 +2,7 @@
 using AggregatorService.Context;
 using AggregatorService.DTOs;
 using AggregatorService.Entities;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace AggregatorService.Services
@@ -10,25 +11,25 @@ namespace AggregatorService.Services
     {
         private readonly CourseUserDbContext _context;
         private readonly HttpClient _httpClient;
+
         public CourseUserService(CourseUserDbContext context, HttpClient httpClient)
         {
             _context = context;
             _httpClient = httpClient;
         }
         public DbSet<CourseUser> Table => _context.Set<CourseUser>();
-
-
+   
         public async Task PostCourse(string courseId, string userId)
         {
-
             CourseUser courseUser = new()
             {
                 CourseId = courseId,
                 UserId = userId
             };
-
+            
             await _context.AddAsync(courseUser);
             await _context.SaveChangesAsync();
+
         }
 
 
@@ -39,7 +40,6 @@ namespace AggregatorService.Services
 
             return course;
         }
-
    
         public async Task<List<UserDto>> GetUsers(string courseId)
         {

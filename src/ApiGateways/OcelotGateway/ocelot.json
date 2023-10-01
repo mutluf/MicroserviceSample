@@ -24,7 +24,7 @@
         }
       ],
       "UpstreamPathTemplate": "/api/courses/users",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "POST" ]
     },
     {
 
