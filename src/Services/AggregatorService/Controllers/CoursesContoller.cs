@@ -10,12 +10,15 @@ namespace AggregatorService.Controllers
     public class CoursesContoller : ControllerBase
     {
         private readonly ICourseUserService _courseUserService;
-        private readonly IBus _bus;
+        private readonly ISendEndpoint _bus;
 
-        public CoursesContoller(ICourseUserService courseUserService, IBus bus)
+        public CoursesContoller(ICourseUserService courseUserService)
         {
             _courseUserService = courseUserService;
-            _bus = bus;
+            var bus = BusConfigurator.ConfigureBus();
+
+            var sendToUri = new Uri($"{RabbitMqConstants.RabbitMqUri}/direct");
+            _bus = bus.GetSendEndpoint(sendToUri).Result;
         }
 
         [HttpGet("{id}/users")]
@@ -23,7 +26,6 @@ namespace AggregatorService.Controllers
         {
             var course = await _courseUserService.GetCourse(id);
             var users =  await _courseUserService.GetUsers(id);
-
 
             return Ok(new {users = users, course= course});
         }
@@ -34,13 +36,7 @@ namespace AggregatorService.Controllers
         {
             _courseUserService.PostCourse(courseUser.CourseId, courseUser.UserId);
 
-            
-
-            Uri endpointUri = new Uri("rabbitmq://localhost/demand"); // Update with your RabbitMQ URI
-
-            var sendEndpoint = await _bus.GetSendEndpoint(endpointUri);
-            await sendEndpoint.Send(courseUser);
-
+            await _bus.Send<IUserEnrolledCommand>(courseUser);
 
             return Ok();
         }
