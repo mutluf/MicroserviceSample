@@ -1,5 +1,7 @@
 ﻿using AggregatorService.Abstractions;
+using AggregatorService.Consumers;
 using AggregatorService.Context;
+using AggregatorService.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,30 +15,33 @@ namespace AggregatorService
             services.AddDbContext<CourseUserDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("MicrosoftSQL")));
 
-            services.AddScoped<ICourseUserService, Services.CourseUserService>();
+            services.AddScoped<ICourseUserService, CourseUserService>();
+         
 
-
-            var busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>
+            services.AddMassTransit(busConfigurator =>
             {
-               
+                busConfigurator.AddConsumer<UserEnrolledConsumer>();
 
-                // Kuyruk oluşturma
-                cfg.ReceiveEndpoint("my_queue", e =>
+                busConfigurator.SetKebabCaseEndpointNameFormatter();
+                busConfigurator.UsingRabbitMq((context, busFactoryConfigurator) =>
                 {
-                    // Kuyruk işlemleri burada tanımlanır.
-                    e.PrefetchCount = 16; // İsteğe bağlı: Mesaj önceden yükleme sayısını ayarlayabilirsiniz.
-                    e.UseConcurrencyLimit(8); // İsteğe bağlı: Paralel işleme sınırlarını ayarlayabilirsiniz.
+                    
 
-                    // Kuyruğa gelen mesajları işleyecek tüketici (consumer) burada eklenir.
-                    //e.Consumer<MyConsumer>();
+                    busFactoryConfigurator.Host("amqp://localhost/", hostConfigurator =>
+                    {
+                        hostConfigurator.Username("guest");
+                        hostConfigurator.Password("guest");
+                    });
+
+                    busFactoryConfigurator.ReceiveEndpoint("test1", e =>
+                    {
+                        e.Consumer<UserEnrolledConsumer>(context);
+                        
+                    });
+
                 });
-            });
+            });          
 
-            busControl.Start();
-
-
-            busControl.Stop();
         }
-
     }
-    }
+}

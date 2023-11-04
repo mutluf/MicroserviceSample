@@ -19,7 +19,7 @@ namespace AggregatorService.Services
         }
         public DbSet<CourseUser> Table => _context.Set<CourseUser>();
    
-        public async Task PostCourse(string courseId, string userId)
+        public async Task AddCourseAsync(string courseId, string userId)
         {
             CourseUser courseUser = new()
             {
@@ -28,10 +28,14 @@ namespace AggregatorService.Services
             };
             
             await _context.AddAsync(courseUser);
-            await _context.SaveChangesAsync();
+           
 
         }
 
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<CourseDto> GetCourse(string courseId)
         {

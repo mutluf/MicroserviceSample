@@ -10,15 +10,12 @@ namespace AggregatorService.Controllers
     public class CoursesContoller : ControllerBase
     {
         private readonly ICourseUserService _courseUserService;
-        private readonly ISendEndpoint _bus;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public CoursesContoller(ICourseUserService courseUserService)
+        public CoursesContoller(ICourseUserService courseUserService, IPublishEndpoint publishEndpoint)
         {
             _courseUserService = courseUserService;
-            var bus = BusConfigurator.ConfigureBus();
-
-            var sendToUri = new Uri($"{RabbitMqConstants.RabbitMqUri}/direct");
-            _bus = bus.GetSendEndpoint(sendToUri).Result;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet("{id}/users")]
@@ -34,9 +31,15 @@ namespace AggregatorService.Controllers
         [Route("/courses/users")]
         public async Task<IActionResult> CoursesPost([FromBody] CourseUser courseUser)
         {
-            _courseUserService.PostCourse(courseUser.CourseId, courseUser.UserId);
+            //_courseUserService.PostCourse(courseUser.CourseId, courseUser.UserId);
+            var data = new UserEnrolledEvent
+            {
 
-            await _bus.Send<IUserEnrolledCommand>(courseUser);
+                UserId = courseUser.UserId,
+                CourseId = courseUser.CourseId,
+            };
+
+            await _publishEndpoint.Publish(data);
 
             return Ok();
         }
