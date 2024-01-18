@@ -35,7 +35,7 @@ namespace AggregatorService
 
                     busFactoryConfigurator.ReceiveEndpoint("test1", e =>
                     {
-                        e.Consumer<UserEnrolledConsumer>(context);
+                        //e.Consumer<UserEnrolledConsumer>(context);
                         
                     });
 
